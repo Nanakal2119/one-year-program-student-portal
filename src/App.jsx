@@ -10,7 +10,7 @@ import {
 } from "react-router-dom";
 import { getCurrentStudent, getStudentResults, students } from "./data/mockStudents";
 
-import Login from "./pages/Login";
+import Login from "./pages/login";
 import ExamOTP from "./pages/ExamOTP";
 import TakeExam from "./pages/TakeExam";
 import ExamResult from "./pages/ExamResult";
