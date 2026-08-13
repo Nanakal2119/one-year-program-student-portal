@@ -22,7 +22,7 @@ import AdminQuestions from "./pages/AdminQuestions";
 import AdminOTP from "./pages/AdminOTP";
 import AdminResults from "./pages/AdminResults";
 import AdminSettings from "./pages/AdminSettings";
-import AdminApplications from "./pages/adminApplications";
+import AdminApplications from "./pages/AdminApplications";
 import AdminLayout from "./components/AdminLayout";
 import "./index.css";
 
