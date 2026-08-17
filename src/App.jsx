@@ -8,8 +8,8 @@ import {
   useNavigate,
   useSearchParams
 } from "react-router-dom";
-import { getCurrentStudent, getStudentResults, students } from "./data/mockStudents";
-
+import {getStudentResults
+} from "./data/mockStudents";
 import Login from "./pages/login";
 import ExamOTP from "./pages/ExamOTP";
 import TakeExam from "./pages/TakeExam";
@@ -145,21 +145,33 @@ const results = [
 
 function Sidebar({ isOpen, closeSidebar }) {
   const links = [
-  ["Dashboard", "/"],
-  ["My Courses", "/courses"],
-  ["Exams", "/exams"],
-  ["Results", "/results"],
-  ["🎥 Learning Resources", "/learning-resources"],
-  ["My Profile", "/profile"],
-  ["Student Services", "/services"],
-  ["Settings", "/settings"],
-];
+    ["Dashboard", "/"],
+    ["My Courses", "/courses"],
+    ["Exams", "/exams"],
+    ["Results", "/results"],
+    ["🎥 Learning Resources", "/learning-resources"],
+    ["My Profile", "/profile"],
+    ["Student Services", "/services"],
+    ["Settings", "/settings"],
+  ];
 
   const studentName = getStudentName();
+  const studentEmail = getStudentEmail();
+
+  const logout = () => {
+    localStorage.removeItem("studentLoggedIn");
+    localStorage.removeItem("loggedInStudentId");
+    localStorage.removeItem("studentName");
+    localStorage.removeItem("studentEmail");
+    localStorage.removeItem("currentStudent");
+
+    closeSidebar();
+
+    window.location.href = "/login";
+  };
 
   return (
     <>
-      {/* Mobile overlay */}
       {isOpen && (
         <div
           className="sidebar-overlay"
@@ -167,15 +179,28 @@ function Sidebar({ isOpen, closeSidebar }) {
         />
       )}
 
-      <aside className={`sidebar ${isOpen ? "sidebar-open" : ""}`}>
+      <aside
+        className={`sidebar ${
+          isOpen ? "sidebar-open" : ""
+        }`}
+      >
 
         <div className="logo">
-          <div className="logo-icon">K</div>
-          <div>
-            <strong>Student Portal</strong>
-            <small>የአ/አ/ቅ/ኪ/ካ/ፍ/ጽ/ሰ/ት/ቤት</small>
+
+          <div className="logo-icon">
+            K
           </div>
-          {/* Close button - mobile only */}
+
+          <div>
+            <strong>
+              Student Portal
+            </strong>
+
+            <small>
+              የአ/አ/ቅ/ኪ/ካ/ፍ/ጽ/ሰ/ት/ቤት
+            </small>
+          </div>
+
           <button
             className="sidebar-close"
             onClick={closeSidebar}
@@ -183,6 +208,7 @@ function Sidebar({ isOpen, closeSidebar }) {
           >
             ×
           </button>
+
         </div>
 
         <nav>
@@ -204,8 +230,9 @@ function Sidebar({ isOpen, closeSidebar }) {
         </nav>
 
         <div className="sidebar-bottom">
-          {/* Profile section */}
+
           <div className="sidebar-profile">
+
             <div className="avatar">
               {studentName
                 .split(" ")
@@ -214,27 +241,36 @@ function Sidebar({ isOpen, closeSidebar }) {
                 .slice(0, 2)
                 .toUpperCase()}
             </div>
+
             <div>
-              <strong>{studentName}</strong>
-              <small>{getStudentEmail()}</small>
+              <strong>
+                {studentName}
+              </strong>
+
+              <small>
+                {studentEmail}
+              </small>
             </div>
+
           </div>
 
           <div className="sidebar-year">
-            <span>Academic Year</span>
-            <strong>2026</strong>
+            <span>
+              Academic Year
+            </span>
+
+            <strong>
+              2026
+            </strong>
           </div>
 
           <button
             className="logout-btn"
-            onClick={() => {
-              localStorage.removeItem("studentLoggedIn");
-              closeSidebar();
-              window.location.href = "/login";
-            }}
+            onClick={logout}
           >
             Logout
           </button>
+
         </div>
 
       </aside>
@@ -243,24 +279,56 @@ function Sidebar({ isOpen, closeSidebar }) {
 }
 
 /* =========================
-   STUDENT SETTINGS HELPERS
+   CURRENT STUDENT HELPERS
 ========================= */
 
+export function getLoggedInStudent() {
+  try {
+    const savedStudent = localStorage.getItem("currentStudent");
+
+    if (!savedStudent) {
+      return null;
+    }
+
+    return JSON.parse(savedStudent);
+  } catch (error) {
+    console.error(
+      "Could not load current student:",
+      error
+    );
+
+    return null;
+  }
+}
+
 function getStudentName() {
-  const currentStudent = getCurrentStudent();
+  const student = getLoggedInStudent();
 
   return (
     localStorage.getItem("studentName") ||
-    currentStudent.name
+    student?.name ||
+    "Student"
   );
 }
 
 function getStudentEmail() {
-  const currentStudent = getCurrentStudent();
+  const student = getLoggedInStudent();
 
   return (
     localStorage.getItem("studentEmail") ||
-    currentStudent.email
+    student?.email ||
+    ""
+  );
+}
+
+function getStudentId() {
+  const student = getLoggedInStudent();
+
+  return (
+    localStorage.getItem("loggedInStudentId") ||
+    student?.studentId ||
+    student?.id ||
+    ""
   );
 }
 
@@ -275,19 +343,29 @@ function notifyStudentUpdate() {
    TOPBAR
 ========================= */
 
+<div className="portal-logo">
+  <img
+    src="/finot-logo.jpg"
+    alt="የአየርጤና አንቀጸ ብርሃን ቅድስት ኪዳነምሕረት ካቴድራል ፍኖተ ጽድቅ ሰንበት ት/ቤት"
+  />
+
+  <div className="portal-logo-text">
+    <strong>የአየርጤና አንቀጸ ብርሃን ቅድስት ኪዳነምሕረት ካቴድራል ፍኖተ ጽድቅ ሰንበት ት/ቤት</strong>
+    <span>Student Portal</span>
+  </div>
+</div>
+
 function Topbar({ openSidebar }) {
   const navigate = useNavigate();
 
   const profileImage =
     localStorage.getItem("profileImage") || "";
 
-  const [studentName, setStudentName] = useState(
-    getStudentName()
-  );
+  const [studentName, setStudentName] =
+    useState(getStudentName());
 
-  const [studentEmail, setStudentEmail] = useState(
-    getStudentEmail()
-  );
+  const [studentEmail, setStudentEmail] =
+    useState(getStudentEmail());
 
   useEffect(() => {
     const updateStudentInfo = () => {
@@ -312,16 +390,17 @@ function Topbar({ openSidebar }) {
     <header className="topbar">
 
       <button
-  className="mobile-menu-btn"
-  onClick={openSidebar}
-  aria-label="Open menu"
->
-  ☰
-</button>
+        className="mobile-menu-btn"
+        onClick={openSidebar}
+        aria-label="Open menu"
+      >
+        ☰
+      </button>
 
       <div>
         <h1>
-          እንኳን ደኅና መጡ, {studentName.split(" ")[0]} 👋
+          እንኳን ወደ ፍኖተ ጽድቅ ሰንበት ት/ቤት በደኅና መጡ,{" "}
+          {studentName.split(" ")[0]} 👋
         </h1>
 
         <p>
@@ -353,8 +432,15 @@ function Topbar({ openSidebar }) {
         )}
 
         <div className="top-profile-info">
-          <strong>{studentName}</strong>
-          <small>{studentEmail}</small>
+
+          <strong>
+            {studentName}
+          </strong>
+
+          <small>
+            {studentEmail}
+          </small>
+
         </div>
 
       </button>
@@ -399,81 +485,129 @@ function Layout({ children }) {
    DASHBOARD
 ========================= */
 
-function Stat({ title, value, icon }) {
-  return (
-    <div className="stat-card">
-      <div className="stat-icon">{icon}</div>
-      <div>
-        <small>{title}</small>
-        <h2>{value}</h2>
-      </div>
-    </div>
-  );
-}
-
 function Dashboard() {
-  const currentStudent = getCurrentStudent();
-  
+  const currentStudent = getLoggedInStudent();
+
   return (
     <>
       <div className="page-title">
         <div>
-          <h1>Dashboard</h1>
-          <p>Your academic overview</p>
+          <h1>
+            Dashboard
+          </h1>
+
+          <p>
+            Your academic overview
+          </p>
         </div>
       </div>
 
       <div className="dashboard-grid">
+
         <section className="card">
+
           <div className="card-header">
-            <h3>Current Courses</h3>
-            <NavLink to="/courses">View all</NavLink>
+            <h3>
+              Current Courses
+            </h3>
+
+            <NavLink to="/courses">
+              View all
+            </NavLink>
           </div>
 
           {courses[0].courses.map((course) => (
-            <div className="course-row" key={course.code}>
+            <div
+              className="course-row"
+              key={course.code}
+            >
+
               <div>
-                <strong>{course.name}</strong>
-                <small>{course.code} • {course.credit} Credits</small>
+                <strong>
+                  {course.name}
+                </strong>
+
+                <small>
+                  {course.code}
+                </small>
               </div>
 
               <div className="progress-container">
-                <span>{course.progress}%</span>
+
+                <span>
+                  {course.progress}%
+                </span>
+
                 <div className="progress">
-                  <div style={{ width: `${course.progress}%` }} />
+                  <div
+                    style={{
+                      width: `${course.progress}%`,
+                    }}
+                  />
                 </div>
+
               </div>
+
             </div>
           ))}
+
         </section>
 
         <section className="card">
+
           <div className="card-header">
-            <h3>Upcoming Exams</h3>
-            <NavLink to="/exams">View all</NavLink>
+            <h3>
+              Upcoming Exams
+            </h3>
+
+            <NavLink to="/exams">
+              View all
+            </NavLink>
           </div>
 
           {exams.map((exam) => (
-            <div className="exam-row" key={exam.code}>
-              <div className="exam-icon">📝</div>
+            <div
+              className="exam-row"
+              key={exam.code}
+            >
+
+              <div className="exam-icon">
+                📝
+              </div>
 
               <div>
-                <strong>{exam.course}</strong>
-                <small>{exam.date} • {exam.time}</small>
+                <strong>
+                  {exam.course}
+                </strong>
+
+                <small>
+                  {exam.date} • {exam.time}
+                </small>
               </div>
+
             </div>
           ))}
+
         </section>
+
       </div>
 
       <section className="card">
+
         <div className="card-header">
-          <h3>Recent Results</h3>
-          <NavLink to="/results">View all</NavLink>
+          <h3>
+            Recent Results
+          </h3>
+
+          <NavLink to="/results">
+            View all
+          </NavLink>
         </div>
 
         <div className="table-container">
+
           <table>
+
             <thead>
               <tr>
                 <th>Course</th>
@@ -484,23 +618,46 @@ function Dashboard() {
             </thead>
 
             <tbody>
-              {(currentStudent.results || []).slice(0, 3).map((result) => (
-                <tr key={result.code}>
-                  <td>{result.course}</td>
-                  <td>{result.code}</td>
-                  <td>{result.score}%</td>
-                  <td>
-                    <span className="grade">{result.grade}</span>
-                  </td>
-                </tr>
-              ))}
+
+              {(currentStudent?.results || [])
+                .slice(0, 3)
+                .map((result) => (
+
+                  <tr key={result.code}>
+
+                    <td>
+                      {result.course}
+                    </td>
+
+                    <td>
+                      {result.code}
+                    </td>
+
+                    <td>
+                      {result.score}%
+                    </td>
+
+                    <td>
+                      <span className="grade">
+                        {result.grade}
+                      </span>
+                    </td>
+
+                  </tr>
+
+                ))}
+
             </tbody>
+
           </table>
+
         </div>
+
       </section>
     </>
   );
 }
+
 
 /* =========================
    COURSES
@@ -806,46 +963,122 @@ function Exams() {
 ========================= */
 
 function Results() {
-  const currentStudent = getCurrentStudent();
+  const currentStudent = getLoggedInStudent();
+
+
   const [examResults, setExamResults] = useState([]);
 
-  useEffect(() => {
-    // Get student results from the data
-    const studentResults = getStudentResults(currentStudent.id);
-    setExamResults(studentResults);
-  }, [currentStudent.id]);
 
-  // Calculate average score
-  const averageScore = examResults.length > 0
-    ? Math.round(examResults.reduce((sum, r) => sum + r.score, 0) / examResults.length)
-    : 0;
+  useEffect(() => {
+    if (!currentStudent) {
+      setExamResults([]);
+      return;
+    }
+
+
+    // Get the ID of the currently logged-in student
+    const studentId =
+      currentStudent.studentId ||
+      currentStudent.id;
+
+
+    // Results belonging specifically to this student
+    const studentResults =
+      currentStudent.results || [];
+
+
+    setExamResults(studentResults);
+  }, [currentStudent]);
+
+
+  const averageScore =
+    examResults.length > 0
+      ? Math.round(
+          examResults.reduce(
+            (sum, result) =>
+              sum + Number(result.score || 0),
+            0
+          ) / examResults.length
+        )
+      : 0;
 
   return (
     <>
       <div className="page-title">
         <div>
-          <h1>Results</h1>
-          <p>Your academic examination results</p>
+          <h1>
+            Results
+          </h1>
+
+          <p>
+            Your academic examination results
+          </p>
         </div>
       </div>
 
       <div className="stats">
-        <Stat title="Overall GPA" value={currentStudent.gpa || "N/A"} icon="GPA" />
-        <Stat title="Average Score" value={examResults.length > 0 ? `${averageScore}%` : "N/A"} icon="%" />
-        <Stat title="Courses Passed" value={examResults.length || 0} icon="✓" />
-        <Stat title="Total Credits" value={examResults.length * 3 || 0} icon="C" />
+
+        <Stat
+          title="Overall GPA"
+          value={
+            currentStudent?.gpa ||
+            "N/A"
+          }
+          icon="GPA"
+        />
+
+        <Stat
+          title="Average Score"
+          value={
+            examResults.length > 0
+              ? `${averageScore}%`
+              : "N/A"
+          }
+          icon="%"
+        />
+
+        <Stat
+          title="Courses Passed"
+          value={
+            examResults.length
+          }
+          icon="✓"
+        />
+
+        <Stat
+          title="Total Credits"
+          value={
+            examResults.length * 3
+          }
+          icon="C"
+        />
+
       </div>
 
       <section className="card">
-        <h3>Course Results</h3>
+
+        <h3>
+          Course Results
+        </h3>
 
         {examResults.length === 0 ? (
-          <p style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>
+
+          <p
+            style={{
+              textAlign: "center",
+              padding: "20px",
+              color: "#6b7280",
+            }}
+          >
             No results available yet.
           </p>
+
         ) : (
+
           <div className="table-container">
+
             <table>
+
               <thead>
                 <tr>
                   <th>Course</th>
@@ -855,24 +1088,53 @@ function Results() {
                   <th>Status</th>
                 </tr>
               </thead>
+
               <tbody>
-                {examResults.map((result) => (
-                  <tr key={result.code}>
-                    <td>{result.course}</td>
-                    <td>{result.code}</td>
-                    <td>{result.score}%</td>
-                    <td>
-                      <span className="grade">{result.grade}</span>
-                    </td>
-                    <td>
-                      <span className="passed">Passed</span>
-                    </td>
-                  </tr>
-                ))}
+
+                {examResults.map(
+                  (result) => (
+
+                    <tr
+                      key={result.code}
+                    >
+
+                      <td>
+                        {result.course}
+                      </td>
+
+                      <td>
+                        {result.code}
+                      </td>
+
+                      <td>
+                        {result.score}%
+                      </td>
+
+                      <td>
+                        <span className="grade">
+                          {result.grade}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span className="passed">
+                          Passed
+                        </span>
+                      </td>
+
+                    </tr>
+
+                  )
+                )}
+
               </tbody>
+
             </table>
+
           </div>
+
         )}
+
       </section>
     </>
   );
@@ -883,7 +1145,7 @@ function Results() {
 ========================= */
 
 function Profile() {
-  const currentStudent = getCurrentStudent();
+  const currentStudent = getLoggedInStudent();
   const [studentName, setStudentName] = useState(getStudentName());
   const [studentEmail, setStudentEmail] = useState(getStudentEmail());
   const [profileImage, setProfileImage] = useState(localStorage.getItem("profileImage") || "");
@@ -1088,8 +1350,7 @@ function Profile() {
           </div>
 
           <h2>{studentName}</h2>
-          <span className="profile-student-id">{currentStudent.id}</span>
-
+          <span className="profile-student-id">{currentStudent?.studentId || currentStudent?.id}</span>
           <div className="profile-status">
             <span className="status-dot"></span>
             Learning in Progress
@@ -1145,7 +1406,7 @@ function Profile() {
               <div className="field-icon">✉️</div>
               <div>
                 <small>ኢ-ሜይል</small>
-                <strong>{currentStudent.email}</strong>
+                <strong>{studentEmail}</strong>
               </div>
             </div>
 
@@ -1744,12 +2005,21 @@ function ProtectedRoute({ children }) {
   const isLoggedIn =
     localStorage.getItem("studentLoggedIn") === "true";
 
-  if (!isLoggedIn) {
-  return <Navigate to="/login" replace />;
-}
+  const studentId =
+    localStorage.getItem("loggedInStudentId");
+
+  if (!isLoggedIn || !studentId) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
+  }
 
   return children;
 }
+
 
 /* =========================
    SERVICES
