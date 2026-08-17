@@ -1,65 +1,144 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { students } from "../data/mockStudents";
 
 function Login() {
   const navigate = useNavigate();
 
   const [studentId, setStudentId] = useState("");
   const [password, setPassword] = useState("");
-
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
 
     setError("");
 
-    if (!studentId.trim() || !password.trim()) {
-      setError(
-        "Please enter your Student ID and password."
-      );
+    const enteredId = studentId.trim();
+    const enteredPassword = password.trim();
+
+    if (!enteredId || !enteredPassword) {
+      setError("Please enter your Student ID and password.");
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "https://one-year-program-server.vercel.app/api/students/login",
-        {
-          method: "POST",
+      /*
+       * Find the student.
+       * Supports both "id" and "studentId".
+       */
+      const student = students.find((item) => {
+        const id = String(
+          item.studentId ||
+          item.id ||
+          ""
+        ).trim();
 
-          headers: {
-            "Content-Type": "application/json",
-          },
+        return id.toLowerCase() === enteredId.toLowerCase();
+      });
 
-          body: JSON.stringify({
-            studentId:
-              studentId.trim(),
+      /*
+       * TEMPORARY PORTAL LOGIN
+       *
+       * CS2026-001 / 123456 is always accepted
+       * even if the mock student's password field
+       * is missing.
+       */
+      const isDefaultLogin =
+        enteredId.toLowerCase() === "cs2026-001" &&
+        enteredPassword === "123456";
 
-            password:
-              password.trim(),
-          }),
-        }
-      );
+      /*
+       * If it's the default student, create/use
+       * the student information.
+       */
+      if (isDefaultLogin) {
+        const defaultStudent =
+          student || {
+            id: "CS2026-001",
+            studentId: "CS2026-001",
+            name: "Kalkidan Mehari",
+            email: "student@example.com",
+            gender: "Female",
+            entryYear: 2026,
+            phone: "",
+            gpa: 0,
+            results: []
+          };
 
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-        setError(
-          data.message ||
-            "Unable to log in."
+        localStorage.setItem(
+          "studentLoggedIn",
+          "true"
         );
 
+        localStorage.setItem(
+          "loggedInStudentId",
+          "CS2026-001"
+        );
+
+        localStorage.setItem(
+          "studentName",
+          defaultStudent.name || "Kalkidan Mehari"
+        );
+
+        localStorage.setItem(
+          "studentEmail",
+          defaultStudent.email || ""
+        );
+
+        localStorage.setItem(
+          "studentPassword",
+          "123456"
+        );
+
+        localStorage.setItem(
+          "currentStudent",
+          JSON.stringify({
+            ...defaultStudent,
+            id: "CS2026-001",
+            studentId: "CS2026-001",
+            password: "123456"
+          })
+        );
+
+        navigate("/", { replace: true });
         return;
       }
 
-      /* =========================
-         SAVE LOGGED-IN STUDENT
-      ========================= */
+      /*
+       * Normal mock-student login.
+       */
+      if (!student) {
+        setError("Invalid Student ID or password.");
+        setLoading(false);
+        return;
+      }
 
+      const storedPassword =
+        student.password ||
+        student.pass ||
+        "123456";
+
+      if (
+        String(storedPassword) !==
+        String(enteredPassword)
+      ) {
+        setError("Invalid Student ID or password.");
+        setLoading(false);
+        return;
+      }
+
+      const actualStudentId =
+        student.studentId ||
+        student.id;
+
+      /*
+       * Save login information.
+       */
       localStorage.setItem(
         "studentLoggedIn",
         "true"
@@ -67,55 +146,38 @@ function Login() {
 
       localStorage.setItem(
         "loggedInStudentId",
-        data.student.studentId
-      );
-
-      localStorage.setItem(
-        "studentDatabaseId",
-        data.student.id
+        String(actualStudentId)
       );
 
       localStorage.setItem(
         "studentName",
-        data.student.name
+        student.name || "Student"
       );
 
       localStorage.setItem(
         "studentEmail",
-        data.student.email
+        student.email || ""
       );
 
-      /* =========================
-         SAVE COMPLETE STUDENT
-      ========================= */
+      localStorage.setItem(
+        "studentPassword",
+        String(storedPassword)
+      );
 
       localStorage.setItem(
         "currentStudent",
-        JSON.stringify(
-          data.student
-        )
+        JSON.stringify(student)
       );
 
-      console.log(
-        "Login successful:",
-        data.student
-      );
-
-      navigate("/", {
-        replace: true,
-      });
+      navigate("/", { replace: true });
 
     } catch (error) {
-      console.error(
-        "Login error:",
-        error
-      );
+      console.error("Login error:", error);
 
       setError(
-        "Unable to connect to the server. Please try again."
+        "Unable to log in. Please try again."
       );
 
-    } finally {
       setLoading(false);
     }
   };
@@ -126,57 +188,95 @@ function Login() {
       <div className="login-card">
 
         <div className="login-logo">
-          K
+          <img
+            src="/finot-logo.jpg"
+            alt="Student Portal"
+          />
         </div>
 
-        <h1>
-          Student Portal
-        </h1>
+        <div className="login-header">
 
-        <p className="login-subtitle">
-          Sign in to access your academic portal
-        </p>
+          <h1>
+            Student Portal
+          </h1>
 
-        <form
-          onSubmit={handleLogin}
-        >
+          <p>
+            እንኳን ወደ ፍኖተ ጽድቅ ሰንበት ት/ቤት
+            በደኅና መጡ
+          </p>
 
-          <label>
-            Student ID
-          </label>
+        </div>
 
-          <input
-            type="text"
-            placeholder="Enter your Student ID"
-            value={studentId}
-            onChange={(e) =>
-              setStudentId(
-                e.target.value
-              )
-            }
-            disabled={loading}
-          />
+        <form onSubmit={handleLogin}>
 
-          <label>
-            Password
-          </label>
+          <div className="form-group">
 
-          <input
-            type="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) =>
-              setPassword(
-                e.target.value
-              )
-            }
-            disabled={loading}
-          />
+            <label htmlFor="studentId">
+              Student ID
+            </label>
+
+            <input
+              id="studentId"
+              type="text"
+              value={studentId}
+              onChange={(e) => {
+                setStudentId(e.target.value);
+                setError("");
+              }}
+              placeholder="Enter your Student ID"
+              autoComplete="username"
+              disabled={loading}
+            />
+
+          </div>
+
+          <div className="form-group">
+
+            <label htmlFor="password">
+              Password
+            </label>
+
+            <div className="password-input-wrapper">
+
+              <input
+                id="password"
+                type={
+                  showPassword
+                    ? "text"
+                    : "password"
+                }
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError("");
+                }}
+                placeholder="Enter your password"
+                autoComplete="current-password"
+                disabled={loading}
+              />
+
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() =>
+                  setShowPassword(
+                    !showPassword
+                  )
+                }
+              >
+                {showPassword
+                  ? "Hide"
+                  : "Show"}
+              </button>
+
+            </div>
+
+          </div>
 
           {error && (
-            <p className="login-error">
+            <div className="login-error">
               {error}
-            </p>
+            </div>
           )}
 
           <button
@@ -191,22 +291,13 @@ function Login() {
 
         </form>
 
-        <div
-          className="login-help"
-          style={{
-            textAlign: "center",
-            marginTop: "20px",
-          }}
-        >
-          <p
-            style={{
-              margin: "5px 0",
-              fontSize: "13px",
-              color: "#6b7280",
-            }}
-          >
-            Your Student ID and password are provided after your registration is approved.
+        <div className="login-footer">
+
+          <p>
+            If you have forgotten your password,
+            please contact the administration.
           </p>
+
         </div>
 
       </div>
