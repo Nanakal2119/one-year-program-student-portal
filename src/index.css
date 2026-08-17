@@ -4236,3 +4236,292 @@ body.font-extra-large {
   border-color: #4b5563;
 }
 
+/* ========================================
+   LEARNING RESOURCES
+======================================== */
+
+.learning-resources-page {
+  width: 100%;
+}
+
+.learning-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
+  margin-bottom: 25px;
+  padding: 18px 20px;
+  background: white;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+}
+
+.learning-toolbar label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.learning-toolbar select {
+  min-width: 180px;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+}
+
+.resource-count {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.student-resource-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(280px, 1fr)
+  );
+  gap: 22px;
+}
+
+.student-resource-card {
+  position: relative;
+  overflow: hidden;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+.student-resource-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.student-video-badge,
+.student-month-badge {
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.student-video-badge {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.student-month-badge {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.student-resource-icon {
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  border-radius: 14px;
+  background: #2563eb;
+  color: white;
+  font-size: 22px;
+}
+
+.student-resource-card h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  color: #111827;
+}
+
+.student-resource-course {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 5px;
+}
+
+.student-resource-class {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.student-resource-description {
+  margin: 16px 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.student-resource-duration {
+  margin-bottom: 18px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.student-resource-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.student-resource-actions .primary-btn,
+.student-resource-actions .outline-btn {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.resource-status {
+  text-align: center;
+  padding: 60px 25px;
+}
+
+.resource-loading-icon {
+  font-size: 42px;
+  margin-bottom: 12px;
+}
+
+.resource-status h3 {
+  margin: 0 0 8px;
+}
+
+.resource-status p {
+  max-width: 500px;
+  margin: 0 auto;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.resource-status.error {
+  border: 1px solid #fecaca;
+}
+
+/* ========================================
+   VIDEO MODAL
+======================================== */
+
+.video-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.video-modal {
+  width: min(900px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 16px;
+}
+
+.video-modal-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 24px;
+}
+
+.video-modal-header span {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.video-modal-header h2 {
+  margin: 5px 0 0;
+  font-size: 21px;
+}
+
+.video-modal-close {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  background: #000;
+}
+
+.video-container iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.video-modal-description {
+  padding: 20px 24px;
+}
+
+.video-modal-description h3 {
+  margin: 0 0 8px;
+}
+
+.video-modal-description p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.video-modal-resource {
+  padding: 0 24px 24px;
+}
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 768px) {
+  .learning-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .learning-toolbar select {
+    width: 100%;
+  }
+
+  .student-resource-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .video-modal-overlay {
+    padding: 10px;
+  }
+
+  .video-modal-header {
+    padding: 16px;
+  }
+
+  .video-modal-description {
+    padding: 16px;
+  }
+
+  .video-modal-resource {
+    padding: 0 16px 16px;
+  }
+}
+

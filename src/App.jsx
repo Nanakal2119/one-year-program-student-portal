@@ -24,6 +24,7 @@ import AdminResults from "./pages/AdminResults";
 import AdminSettings from "./pages/AdminSettings";
 import AdminApplications from "./pages/AdminApplications";
 import AdminLayout from "./components/AdminLayout";
+import LearningResources from "./pages/LearningResources";
 import "./index.css";
 
 /* =========================
@@ -144,14 +145,15 @@ const results = [
 
 function Sidebar({ isOpen, closeSidebar }) {
   const links = [
-    ["Dashboard", "/"],
-    ["My Courses", "/courses"],
-    ["Exams", "/exams"],
-    ["Results", "/results"],
-    ["My Profile", "/profile"],
-    ["Student Services", "/services"],
-    ["Settings", "/settings"],
-  ];
+  ["Dashboard", "/"],
+  ["My Courses", "/courses"],
+  ["Exams", "/exams"],
+  ["Results", "/results"],
+  ["🎥 Learning Resources", "/learning-resources"],
+  ["My Profile", "/profile"],
+  ["Student Services", "/services"],
+  ["Settings", "/settings"],
+];
 
   const studentName = getStudentName();
 
@@ -1864,6 +1866,17 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+            path="/learning-resources"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <LearningResources />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
 
         <Route
           path="/profile"
